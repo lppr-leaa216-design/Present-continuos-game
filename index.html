@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Present Continuous Challenge</title>
+<style>
+  :root{
+    --pink-light:#FFD9EC; --pink:#FF7CB0; --purple:#8B6CF0; --purple-light:#D8CCFF;
+    --blue-light:#AEE3F7; --white:#FFFFFF; --dark:#3B3358; --gray:#7A7391;
+    --green:#37C99A; --red:#FF6B6B; --yellow:#FFC857;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{overflow-x:hidden;}
+  body{
+    min-height:100vh;
+    font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;
+    background:linear-gradient(135deg,var(--pink-light),var(--purple-light) 50%,var(--blue-light));
+    background-attachment:fixed;
+    color:var(--dark);
+    display:flex; align-items:center; justify-content:center;
+    padding:16px;
+  }
+  .container{
+    width:100%; max-width:1000px;
+    background:var(--white);
+    border-radius:26px;
+    box-shadow:0 25px 60px rgba(90,60,150,.25);
+    overflow:hidden;
+    min-height:600px;
+    display:flex; flex-direction:column;
+  }
+  .hidden{display:none !important;}
+  .screen{padding:36px; flex:1; display:flex; flex-direction:column; animation:fadeIn .4s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+  /* ===== START SCREEN ===== */
+  #startScreen{align-items:center; justify-content:center; text-align:center; background:linear-gradient(180deg,#fff,#FFF5FA); position:relative;}
+  .game-icon{font-size:3.6rem; margin-bottom:6px;}
+  #startScreen h1{
+    font-size:2.1rem; color:var(--purple); letter-spacing:1px; margin-bottom:8px;
+  }
+  #startScreen .subtitle{font-size:1.1rem; color:var(--pink); font-weight:600; margin-bottom:28px;}
+  .name-box{width:100%; max-width:340px;}
+  .name-box label{display:block; font-weight:700; margin-bottom:8px; color:var(--dark);}
+  #studentName{
+    width:100%; padding:14px 18px; border-radius:16px; border:2px solid var(--purple-light);
+    font-size:1.05rem; outline:none; transition:.2s;
+  }
+  #studentName:focus{border-color:var(--purple); box-shadow:0 0 0 4px rgba(139,108,240,.15);}
+  #nameError{color:var(--red); font-weight:600; margin-top:10px; min-height:20px; font-size:.9rem;}
+  .btn{
+    border:none; cursor:pointer; font-weight:700; border-radius:30px; font-size:1rem;
+    transition:transform .15s, box-shadow .15s; font-family:inherit;
+  }
+  .btn:active{transform:scale(.96);}
+  .btn-primary{
+    background:linear-gradient(90deg,var(--purple),var(--pink)); color:#fff;
+    padding:15px 42px; font-size:1.1rem; margin-top:24px; box-shadow:0 8px 20px rgba(139,108,240,.35);
+  }
+  .btn-primary:hover{box-shadow:0 10px 26px rgba(139,108,240,.5);}
+  .btn-secondary{
+    background:var(--white); color:var(--purple); border:2px solid var(--purple);
+    padding:12px 28px;
+  }
+  .btn-secondary:hover{background:var(--purple); color:#fff;}
+  .sound-toggle{
+    position:absolute; top:18px; right:18px; background:var(--white); border:2px solid var(--purple-light);
+    border-radius:22px; padding:8px 16px; font-weight:700; color:var(--purple); cursor:pointer; font-size:.85rem;
+  }
+
+  /* ===== GAME SCREEN ===== */
+  #gameScreen{position:relative;}
+  .top-bar{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:18px;}
+  .q-counter{font-weight:700; color:var(--purple); font-size:1rem; white-space:nowrap;}
+  .progress-track{flex:1; min-width:140px; height:12px; background:var(--purple-light); border-radius:10px; overflow:hidden;}
+  .progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--pink),var(--purple)); transition:width .4s ease;}
+  .timer-box{
+    display:flex; align-items:center; gap:6px; background:var(--blue-light); padding:8px 16px;
+    border-radius:20px; font-weight:800; color:var(--dark); white-space:nowrap; font-size:.95rem;
+  }
+  .timer-box.low{background:var(--red); color:#fff;}
+
+  .q-card{
+    background:linear-gradient(180deg,#FFFFFF,#FBF7FF);
+    border-radius:22px; padding:28px; box-shadow:0 8px 22px rgba(90,60,150,.12);
+    flex:1; display:flex; flex-direction:column;
+  }
+  .q-emoji{font-size:3.2rem; text-align:center; margin-bottom:8px;}
+  .q-text{font-size:1.25rem; font-weight:700; text-align:center; margin-bottom:8px; line-height:1.4;}
+  .q-tools{display:flex; justify-content:center; gap:10px; margin-bottom:18px; flex-wrap:wrap;}
+  .tool-btn{
+    background:var(--white); border:2px solid var(--purple-light); color:var(--purple);
+    padding:8px 16px; border-radius:18px; font-weight:700; font-size:.85rem; cursor:pointer;
+  }
+  .tool-btn:hover{background:var(--purple-light);}
+  .hint-box{
+    background:var(--yellow); color:#5c4400; font-weight:600; padding:12px 16px; border-radius:14px;
+    text-align:center; margin-bottom:16px; font-size:.92rem;
+  }
+
+  .options{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px;}
+  @media (max-width:560px){.options{grid-template-columns:1fr;}}
+  .opt-btn{
+    background:var(--white); border:2.5px solid #E4DEF7; border-radius:14px; padding:14px 16px;
+    text-align:left; font-size:1rem; font-weight:600; cursor:pointer; color:var(--dark); transition:.15s;
+  }
+  .opt-btn:hover{border-color:var(--purple);}
+  .opt-btn.selected{border-color:var(--purple); background:var(--purple-light);}
+  .opt-btn.correct{background:var(--green); border-color:var(--green); color:#fff;}
+  .opt-btn.wrong{background:var(--red); border-color:var(--red); color:#fff;}
+  .opt-btn.disabled{pointer-events:none; opacity:.85;}
+
+  .type-answer-wrap{margin-bottom:18px; text-align:center;}
+  .type-answer-wrap label{display:block; margin-bottom:8px; font-weight:700; color:var(--gray);}
+  #typeInput{
+    width:100%; max-width:420px; padding:14px 18px; border-radius:14px; border:2.5px solid #E4DEF7;
+    font-size:1.05rem; text-align:center; outline:none;
+  }
+  #typeInput:focus{border-color:var(--purple);}
+  #typeInput.correct{border-color:var(--green); background:#EAFBF4;}
+  #typeInput.wrong{border-color:var(--red); background:#FFEFEF;}
+
+  .action-row{display:flex; justify-content:center; gap:14px; margin-top:auto;}
+  #checkBtn{background:linear-gradient(90deg,var(--purple),var(--pink)); color:#fff; padding:13px 34px;}
+  #nextBtn{background:var(--green); color:#fff; padding:13px 34px;}
+
+  .feedback-box{
+    margin-top:16px; padding:14px 18px; border-radius:14px; font-weight:700; text-align:center;
+    animation:fadeIn .3s ease;
+  }
+  .feedback-box.ok{background:#E6FBF3; color:#0E8A62; border:2px solid var(--green);}
+  .feedback-box.bad{background:#FFF0F0; color:#C0392B; border:2px solid var(--red);}
+  .feedback-box p{font-weight:500; margin-top:6px; font-size:.92rem;}
+
+  /* ===== RESULTS SCREEN ===== */
+  #resultsScreen{text-align:center; align-items:center; justify-content:center;}
+  #resultsScreen h1{font-size:1.9rem; color:var(--purple); margin-bottom:6px;}
+  #resultsScreen .congrats{font-size:1.15rem; font-weight:700; margin-bottom:22px; color:var(--pink);}
+  .stats-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:14px; width:100%; max-width:560px; margin-bottom:22px;
+  }
+  @media (max-width:520px){.stats-grid{grid-template-columns:1fr;}}
+  .stat-card{background:var(--pink-light); border-radius:16px; padding:16px; }
+  .stat-card.inc{background:#FFE3E3;}
+  .stat-card.score{background:var(--blue-light);}
+  .stat-card .num{font-size:1.6rem; font-weight:800; color:var(--dark);}
+  .stat-card .lbl{font-size:.8rem; color:var(--gray); font-weight:700; text-transform:uppercase;}
+  .grade-badge{
+    background:linear-gradient(135deg,var(--purple),var(--pink)); color:#fff; border-radius:50%;
+    width:150px; height:150px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    margin:10px auto 18px; box-shadow:0 10px 28px rgba(139,108,240,.4); animation:pop .5s ease;
+  }
+  @keyframes pop{0%{transform:scale(.4); opacity:0;} 70%{transform:scale(1.08);} 100%{transform:scale(1); opacity:1;}}
+  .grade-badge .g-num{font-size:2.6rem; font-weight:800; line-height:1;}
+  .grade-badge .g-lbl{font-size:.75rem; font-weight:700; letter-spacing:1px;}
+  #finalMessage{font-size:1.05rem; font-weight:700; margin-bottom:24px; max-width:480px;}
+  .teacher-box{
+    background:#F7F5FF; border:2px dashed var(--purple-light); border-radius:16px; padding:16px 20px;
+    text-align:left; width:100%; max-width:420px; margin-bottom:24px; font-size:.9rem; color:var(--dark);
+  }
+  .teacher-box h4{color:var(--purple); margin-bottom:8px; font-size:.85rem; letter-spacing:1px;}
+  .teacher-box div{margin-bottom:4px;}
+  .results-btns{display:flex; gap:14px; flex-wrap:wrap; justify-content:center;}
+
+  footer{text-align:center; padding:10px; font-size:.72rem; color:var(--gray);}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ============ START SCREEN ============ -->
+  <section id="startScreen" class="screen">
+    <button class="sound-toggle" id="soundToggleStart" onclick="toggleSound()">🔊 SOUND: ON</button>
+    <div class="game-icon">🎮</div>
+    <h1>PRESENT CONTINUOUS CHALLENGE</h1>
+    <p class="subtitle">Can you describe what is happening right now?</p>
+    <div class="name-box">
+      <label for="studentName">Student Name</label>
+      <input type="text" id="studentName" placeholder="Enter your name" maxlength="30">
+      <div id="nameError"></div>
+    </div>
+    <button class="btn btn-primary" onclick="handleStart()">🚀 START GAME</button>
+  </section>
+
+  <!-- ============ GAME SCREEN ============ -->
+  <section id="gameScreen" class="screen hidden">
+    <button class="sound-toggle" id="soundToggleGame" onclick="toggleSound()">🔊 SOUND: ON</button>
+    <div class="top-bar">
+      <div class="q-counter" id="qCounter">Question 1 of 20</div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="timer-box" id="timerBox">⏱️ Time: 30</div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-emoji" id="qEmoji"></div>
+      <div class="q-text" id="qText"></div>
+      <div class="q-tools">
+        <button class="tool-btn" onclick="showHint()">💡 HINT</button>
+        <button class="tool-btn" onclick="listenQuestion()">🔊 LISTEN</button>
+      </div>
+      <div class="hint-box hidden" id="hintBox"></div>
+
+      <div id="optionsWrap" class="options hidden"></div>
+      <div id="typeWrap" class="type-answer-wrap hidden">
+        <label>Type your answer:</label>
+        <input type="text" id="typeInput" autocomplete="off" placeholder="Write here...">
+      </div>
+
+      <div class="action-row">
+        <button class="btn" id="checkBtn" onclick="checkAnswer()">CHECK ANSWER</button>
+        <button class="btn hidden" id="nextBtn" onclick="nextQuestion()">NEXT QUESTION ➜</button>
+      </div>
+
+      <div class="feedback-box hidden" id="feedbackBox"></div>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS SCREEN ============ -->
+  <section id="resultsScreen" class="screen hidden">
+    <h1>🎉 CHALLENGE COMPLETE!</h1>
+    <p class="congrats" id="congratsText"></p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="num" id="correctNum">0/20</div>
+        <div class="lbl">Correct Answers</div>
+      </div>
+      <div class="stat-card inc">
+        <div class="num" id="incorrectNum">0/20</div>
+        <div class="lbl">Incorrect Answers</div>
+      </div>
+      <div class="stat-card score">
+        <div class="num" id="scoreNum">0/100</div>
+        <div class="lbl">Score</div>
+      </div>
+    </div>
+
+    <div class="grade-badge">
+      <div class="g-num" id="gradeNum">10</div>
+      <div class="g-lbl">FINAL GRADE / 10</div>
+    </div>
+
+    <p id="finalMessage"></p>
+
+    <div class="teacher-box">
+      <h4>TEACHER INFORMATION</h4>
+      <div><b>Student Name:</b> <span id="tName"></span></div>
+      <div><b>Correct Answers:</b> <span id="tCorrect"></span></div>
+      <div><b>Incorrect Answers:</b> <span id="tIncorrect"></span></div>
+      <div><b>Score:</b> <span id="tScore"></span>/100</div>
+      <div><b>Final Grade:</b> <span id="tGrade"></span>/10</div>
+    </div>
+
+    <div class="results-btns">
+      <button class="btn btn-primary" onclick="playAgain()">🔄 PLAY AGAIN</button>
+      <button class="btn btn-secondary" onclick="backToStart()">🏠 BACK TO START</button>
+    </div>
+  </section>
+
+  <footer>Present Continuous Challenge — English Grammar Practice Game</footer>
+</div>
+
+<script>
+/* =========================================================
+   PRESENT CONTINUOUS CHALLENGE - GAME ENGINE
+   ========================================================= */
+
+/* ========================================
+   QUESTION BANK - EDIT HERE
+   Teachers can freely add, remove or edit
+   questions below. Each question needs:
+   - type: "mcq" (multiple choice) or "text" (typed answer)
+   - emoji: optional, shown above the question
+   - question: the text shown to the student
+   - options: array of 4 choices (mcq only)
+   - answer: the correct option text (mcq only, must match one option exactly)
+   - accept: array of accepted typed answers (text only, lowercase, no punctuation needed)
+   - explanation: shown after answering
+   - hint: shown when the student clicks HINT
+   ======================================== */
+const QUESTION_BANK = [
+  // ---- TYPE 1: Multiple choice (fill the gap) ----
+  {type:"mcq", question:"Look! Sarah ________ a book right now.", options:["read","is reading","reads","reading"], answer:"is reading", explanation:"We use IS with SHE/HE/IT, followed by the verb ending in -ing.", hint:"Remember: Present Continuous = AM / IS / ARE + VERB-ING."},
+  {type:"mcq", question:"My brother ________ football in the garden at the moment.", options:["play","plays","is playing","playing"], answer:"is playing", explanation:"With HE, we use IS + verb-ing for actions happening now.", hint:"Think about the subject: 'my brother' = he."},
+  {type:"mcq", question:"Shh! The baby ________ .", options:["sleep","sleeps","is sleeping","sleeping"], answer:"is sleeping", explanation:"'The baby' is singular (it/he/she), so we use IS + verb-ing.", hint:"A singular subject needs IS, not ARE."},
+  {type:"mcq", question:"We ________ our homework right now.", options:["do","does","are doing","doing"], answer:"are doing", explanation:"With WE, THEY and YOU, we use ARE + verb-ing.", hint:"WE always goes with ARE in the Present Continuous."},
+  {type:"mcq", question:"Listen! The birds ________ outside.", options:["sing","sings","are singing","singing"], answer:"are singing", explanation:"'The birds' is plural, so we use ARE + verb-ing.", hint:"Plural subjects use ARE, not IS."},
+  {type:"mcq", question:"I ________ a message to my friend at the moment.", options:["write","writes","am writing","writing"], answer:"am writing", explanation:"With I, we always use AM + verb-ing.", hint:"I + AM — this combination never changes!"},
+  {type:"mcq", question:"It ________ outside, so take an umbrella.", options:["rain","rains","is raining","raining"], answer:"is raining", explanation:"With IT, we use IS + verb-ing.", hint:"Weather sentences often use IT + IS + verb-ing."},
+  {type:"mcq", question:"My parents ________ dinner in the kitchen right now.", options:["cook","cooks","are cooking","cooking"], answer:"are cooking", explanation:"'My parents' is plural, so we use ARE + verb-ing.", hint:"More than one person = ARE + verb-ing."},
+
+  // ---- TYPE 2: Choose the correct sentence ----
+  {type:"mcq", question:"Which sentence is correct?", options:["She reading a book.","She is reading a book.","She are reading a book.","She read a book now."], answer:"She is reading a book.", explanation:"The Present Continuous needs BE (is) + verb-ing. 'She' takes IS.", hint:"Every Present Continuous sentence needs a form of BE."},
+  {type:"mcq", question:"Which sentence is correct?", options:["They is playing basketball.","They plays basketball now.","They are playing basketball.","They playing basketball."], answer:"They are playing basketball.", explanation:"'They' takes ARE, and the sentence needs both ARE and the -ing form.", hint:"'They' always goes with ARE."},
+  {type:"mcq", question:"Which sentence is correct?", options:["I am study English now.","I studying English now.","I am studying English now.","I studies English now."], answer:"I am studying English now.", explanation:"'I' needs AM, and 'study' becomes 'studying' with -ing.", hint:"Don't forget both parts: AM + verb-ing."},
+  {type:"mcq", question:"Which sentence is correct?", options:["He isn't doing his homework.","He not doing his homework.","He don't doing his homework.","He isn't do his homework."], answer:"He isn't doing his homework.", explanation:"The negative form is IS/AM/ARE + NOT + verb-ing. 'Isn't' is the contraction of 'is not'.", hint:"Negative = BE + NOT + verb-ing."},
+  {type:"mcq", question:"Which sentence is correct?", options:["Are you listening to me?","You are listening to me?","Is you listening to me?","Do you listening to me?"], answer:"Are you listening to me?", explanation:"In questions, BE comes before the subject: ARE + you + verb-ing.", hint:"In questions, the verb BE moves to the beginning."},
+
+  // ---- TYPE 3: Complete the sentence (typed, affirmative) ----
+  {type:"text", question:"Tom ________ (watch) TV right now.", accept:["is watching"], explanation:"'Tom' = he, so we use IS + watching.", hint:"Tom is one person, so use IS."},
+  {type:"text", question:"My sister ________ (make) a cake for the party.", accept:["is making"], explanation:"Spelling rule: when a verb ends in -e, we drop the -e before adding -ing (make → making).", hint:"Don't forget the spelling rule: make → making (drop the e)."},
+  {type:"text", question:"The students ________ (write) a test in class.", accept:["are writing"], explanation:"'The students' is plural, so we use ARE. Also, write → writing (drop the e).", hint:"Plural subject = ARE. Also remember: write → writing."},
+  {type:"text", question:"I ________ (read) a really interesting book.", accept:["am reading"], explanation:"With I, we always use AM + verb-ing.", hint:"I always goes with AM."},
+  {type:"text", question:"We ________ (learn) about the Present Continuous today.", accept:["are learning"], explanation:"With WE, we use ARE + verb-ing.", hint:"WE + ARE + verb-ing."},
+
+  // ---- TYPE 4: Negative sentences (typed) ----
+  {type:"text", question:"She ________ ________ (not / sleep) now.", accept:["is not sleeping","isn't sleeping"], explanation:"Negative form: IS + NOT + verb-ing, or the contraction ISN'T + verb-ing.", hint:"You can write the full form or the contraction: isn't."},
+  {type:"text", question:"They ________ ________ (not / study) at the moment.", accept:["are not studying","aren't studying"], explanation:"Negative form with THEY: ARE + NOT + verb-ing, or AREN'T + verb-ing.", hint:"THEY takes ARE. The contraction is AREN'T."},
+  {type:"text", question:"I ________ ________ (not / watch) TV right now.", accept:["am not watching"], explanation:"With I, the negative is AM NOT + verb-ing (there is no contraction like 'amn't').", hint:"I + am not + verb-ing (no short contraction for 'am not')."},
+  {type:"text", question:"He ________ ________ (not / play) video games today.", accept:["is not playing","isn't playing"], explanation:"Negative form with HE: IS + NOT + verb-ing, or ISN'T + verb-ing.", hint:"HE takes IS. The contraction is ISN'T."},
+
+  // ---- TYPE 5: Questions (Am / Is / Are) ----
+  {type:"mcq", question:"______ they studying English now?", options:["Is","Are","Am","Be"], answer:"Are", explanation:"THEY takes ARE, even at the start of a question.", hint:"THEY always goes with ARE."},
+  {type:"mcq", question:"______ your mom cooking dinner?", options:["Is","Are","Am","Do"], answer:"Is", explanation:"'Your mom' = she, so the question starts with IS.", hint:"'Your mom' is one person (she) = IS."},
+  {type:"mcq", question:"______ I doing this exercise correctly?", options:["Is","Are","Am","Does"], answer:"Am", explanation:"With I, questions start with AM.", hint:"I always goes with AM, even in questions."},
+  {type:"mcq", question:"______ the children playing in the park?", options:["Is","Are","Am","Do"], answer:"Are", explanation:"'The children' is plural, so the question starts with ARE.", hint:"Plural subject = ARE."},
+
+  // ---- TYPE 6: Short answers ----
+  {type:"mcq", question:"Is John playing soccer?", options:["Yes, he is.","Yes, he are.","No, he is.","Yes, he does."], answer:"Yes, he is.", explanation:"Short answers repeat the subject pronoun and the BE verb from the question: Is...? → Yes, he is.", hint:"Match the BE verb from the question in your short answer."},
+  {type:"mcq", question:"Are you doing your homework?", options:["Yes, I am.","Yes, I do.","Yes, I is.","No, I amn't."], answer:"Yes, I am.", explanation:"For 'I', the short answer is 'Yes, I am.' (there is no short form 'amn't').", hint:"Are you...? → Yes, I am. / No, I'm not."},
+  {type:"mcq", question:"Is it raining outside?", options:["Yes, it is.","Yes, it does.","Yes, it are.","Yes, it rain."], answer:"Yes, it is.", explanation:"'It' takes IS, so the short answer is 'Yes, it is.'", hint:"IT goes with IS."},
+  {type:"mcq", question:"Are your friends waiting for you?", options:["Yes, they are.","Yes, they is.","Yes, they do.","Yes, they waiting."], answer:"Yes, they are.", explanation:"'Your friends' is plural (they), so the short answer uses ARE.", hint:"Plural subject → they + ARE."},
+
+  // ---- VISUAL QUESTIONS (emoji) ----
+  {type:"mcq", emoji:"🏃", question:"What is he doing?", options:["He runs.","He is running.","He running.","He is run."], answer:"He is running.", explanation:"Spelling rule: run → running (double the last consonant).", hint:"Double the final consonant: run → running."},
+  {type:"mcq", emoji:"📖", question:"What is she doing?", options:["She reads a book.","She is reading a book.","She reading a book.","She read a book."], answer:"She is reading a book.", explanation:"An action happening right now needs IS/AM/ARE + verb-ing.", hint:"Don't forget the BE verb before the -ing form."},
+  {type:"mcq", emoji:"🍳", question:"What is he doing?", options:["He cooks breakfast.","He is cooking breakfast.","He cooking breakfast.","He cook breakfast."], answer:"He is cooking breakfast.", explanation:"'He' takes IS + verb-ing.", hint:"HE + IS + verb-ing."},
+  {type:"mcq", emoji:"⚽", question:"What are they doing?", options:["They play soccer.","They are playing soccer.","They playing soccer.","They is playing soccer."], answer:"They are playing soccer.", explanation:"'They' takes ARE + verb-ing.", hint:"THEY + ARE + verb-ing."},
+  {type:"mcq", emoji:"🎸", question:"What is she doing?", options:["She plays the guitar.","She is playing the guitar.","She playing the guitar.","She play the guitar."], answer:"She is playing the guitar.", explanation:"'She' takes IS + verb-ing.", hint:"SHE + IS + verb-ing."},
+  {type:"mcq", emoji:"💃", question:"What is she doing?", options:["She dances.","She is dancing.","She dancing.","She dance."], answer:"She is dancing.", explanation:"Spelling rule: dance → dancing (drop the final -e).", hint:"dance → dancing (drop the e)."},
+  {type:"mcq", emoji:"😴", question:"What is he doing?", options:["He sleeps.","He is sleeping.","He sleeping.","He sleep."], answer:"He is sleeping.", explanation:"'He' takes IS + verb-ing.", hint:"HE + IS + verb-ing."},
+  {type:"mcq", emoji:"🏊", question:"What are they doing?", options:["They swim.","They are swimming.","They swimming.","They is swimming."], answer:"They are swimming.", explanation:"Spelling rule: swim → swimming (double the final consonant).", hint:"swim → swimming (double the m)."},
+  {type:"mcq", emoji:"✏️", question:"What is she doing?", options:["She writes a letter.","She is writing a letter.","She writing a letter.","She write a letter."], answer:"She is writing a letter.", explanation:"Spelling rule: write → writing (drop the final -e).", hint:"write → writing (drop the e)."},
+  {type:"mcq", emoji:"🍎", question:"What is he doing?", options:["He eats an apple.","He is eating an apple.","He eating an apple.","He eat an apple."], answer:"He is eating an apple.", explanation:"'He' takes IS + verb-ing.", hint:"HE + IS + verb-ing."},
+];
+
+const TOTAL_QUESTIONS = 20;
+const TIME_PER_QUESTION = 30;
+const POINTS_PER_QUESTION = 5;
+
+/* ========================================
+   GAME STATE
+   ======================================== */
+let state = {
+  studentName: "",
+  questions: [],
+  currentIndex: 0,
+  score: 0,
+  correctCount: 0,
+  incorrectCount: 0,
+  answered: false,
+  selectedOption: null,
+  timeLeft: TIME_PER_QUESTION,
+  timerId: null,
+  soundOn: true,
+};
+
+/* ========================================
+   HELPERS
+   ======================================== */
+function shuffleArray(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+function normalize(str){
+  return str.toLowerCase().trim().replace(/\s+/g," ").replace(/[.!?]+$/,"");
+}
+function $(id){ return document.getElementById(id); }
+
+/* ========================================
+   SOUND (Web Audio API, no external files)
+   ======================================== */
+let audioCtx = null;
+function getAudioCtx(){
+  if(!audioCtx){
+    try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audioCtx = null; }
+  }
+  return audioCtx;
+}
+function playTone(freq, duration, type){
+  if(!state.soundOn) return;
+  const ctx = getAudioCtx();
+  if(!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type || "sine";
+  osc.frequency.value = freq;
+  gain.gain.value = 0.08;
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start();
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+  osc.stop(ctx.currentTime + duration);
+}
+function soundCorrect(){ playTone(880, .18,"sine"); setTimeout(()=>playTone(1180,.18,"sine"),120); }
+function soundWrong(){ playTone(220,.25,"sawtooth"); }
+function soundComplete(){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>playTone(f,.25,"sine"), i*150)); }
+
+function toggleSound(){
+  state.soundOn = !state.soundOn;
+  const label = state.soundOn ? "🔊 SOUND: ON" : "🔇 SOUND: OFF";
+  $("soundToggleStart").textContent = label;
+  $("soundToggleGame").textContent = label;
+}
+
+/* ========================================
+   SPEECH SYNTHESIS
+   ======================================== */
+function listenQuestion(){
+  if(!("speechSynthesis" in window)) return;
+  try{
+    window.speechSynthesis.cancel();
+    const text = $("qText").textContent;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "en-US";
+    utter.rate = 0.95;
+    window.speechSynthesis.speak(utter);
+  }catch(e){ /* fail silently if unsupported */ }
+}
+
+/* ========================================
+   START SCREEN
+   ======================================== */
+function handleStart(){
+  const nameInput = $("studentName");
+  const name = nameInput.value.trim();
+  if(!name){
+    $("nameError").textContent = "Please enter your name to start the game.";
+    nameInput.focus();
+    return;
+  }
+  $("nameError").textContent = "";
+  state.studentName = name;
+  startGame();
+}
+
+/* ========================================
+   GAME FLOW
+   ======================================== */
+function startGame(){
+  const shuffledBank = shuffleArray(QUESTION_BANK);
+  state.questions = shuffledBank.slice(0, TOTAL_QUESTIONS);
+  state.currentIndex = 0;
+  state.score = 0;
+  state.correctCount = 0;
+  state.incorrectCount = 0;
+
+  $("startScreen").classList.add("hidden");
+  $("resultsScreen").classList.add("hidden");
+  $("gameScreen").classList.remove("hidden");
+
+  showQuestion();
+}
+
+function showQuestion(){
+  state.answered = false;
+  state.selectedOption = null;
+
+  const q = state.questions[state.currentIndex];
+  const idx = state.currentIndex;
+
+  $("qCounter").textContent = `Question ${idx+1} of ${TOTAL_QUESTIONS}`;
+  $("progressFill").style.width = (idx/TOTAL_QUESTIONS*100) + "%";
+
+  $("qEmoji").textContent = q.emoji || "";
+  $("qText").textContent = q.question;
+
+  $("hintBox").classList.add("hidden");
+  $("hintBox").textContent = "";
+
+  $("feedbackBox").classList.add("hidden");
+  $("feedbackBox").innerHTML = "";
+
+  $("checkBtn").classList.remove("hidden");
+  $("checkBtn").disabled = false;
+  $("nextBtn").classList.add("hidden");
+
+  if(q.type === "mcq"){
+    $("optionsWrap").classList.remove("hidden");
+    $("typeWrap").classList.add("hidden");
+    const wrap = $("optionsWrap");
+    wrap.innerHTML = "";
+    const shuffledOptions = shuffleArray(q.options);
+    shuffledOptions.forEach(opt=>{
+      const btn = document.createElement("button");
+      btn.className = "opt-btn";
+      btn.textContent = opt;
+      btn.onclick = ()=> selectOption(btn, opt);
+      wrap.appendChild(btn);
+    });
+  } else {
+    $("optionsWrap").classList.add("hidden");
+    $("typeWrap").classList.remove("hidden");
+    const input = $("typeInput");
+    input.value = "";
+    input.className = "";
+    input.disabled = false;
+  }
+
+  startTimer();
+}
+
+function selectOption(btn, value){
+  if(state.answered) return;
+  document.querySelectorAll("#optionsWrap .opt-btn").forEach(b=>b.classList.remove("selected"));
+  btn.classList.add("selected");
+  state.selectedOption = value;
+}
+
+/* ========================================
+   TIMER
+   ======================================== */
+function startTimer(){
+  clearInterval(state.timerId);
+  state.timeLeft = TIME_PER_QUESTION;
+  updateTimerDisplay();
+  state.timerId = setInterval(()=>{
+    state.timeLeft--;
+    updateTimerDisplay();
+    if(state.timeLeft <= 0){
+      clearInterval(state.timerId);
+      timeUp();
+    }
+  },1000);
+}
+function updateTimerDisplay(){
+  const box = $("timerBox");
+  box.textContent = `⏱️ Time: ${state.timeLeft}`;
+  box.classList.toggle("low", state.timeLeft <= 10);
+}
+function timeUp(){
+  if(state.answered) return;
+  const q = state.questions[state.currentIndex];
+  if(q.type === "mcq"){
+    document.querySelectorAll("#optionsWrap .opt-btn").forEach(b=>{
+      b.classList.add("disabled");
+      if(b.textContent === q.answer) b.classList.add("correct");
+    });
+  } else {
+    $("typeInput").disabled = true;
+  }
+  const feedback = $("feedbackBox");
+  feedback.classList.remove("hidden");
+  feedback.className = "feedback-box bad";
+  const correctText = q.type === "mcq" ? q.answer : q.accept[0];
+  feedback.innerHTML = `<div>⏰ Time's up!</div><p>The correct answer is: <b>${correctText}</b>. ${q.explanation}</p>`;
+  soundWrong();
+  finalizeAnswer(false);
+}
+
+/* ========================================
+   CHECK ANSWER
+   ======================================== */
+function checkAnswer(){
+  if(state.answered) return;
+  const q = state.questions[state.currentIndex];
+  let isCorrect = false;
+
+  if(q.type === "mcq"){
+    if(!state.selectedOption){
+      return; // must select an option first
+    }
+    isCorrect = state.selectedOption === q.answer;
+    document.querySelectorAll("#optionsWrap .opt-btn").forEach(b=>{
+      b.classList.add("disabled");
+      if(b.textContent === q.answer) b.classList.add("correct");
+      else if(b.textContent === state.selectedOption && !isCorrect) b.classList.add("wrong");
+    });
+  } else {
+    const typed = $("typeInput").value;
+    if(!typed.trim()) return;
+    const normTyped = normalize(typed);
+    isCorrect = q.accept.some(a => normalize(a) === normTyped);
+    const input = $("typeInput");
+    input.disabled = true;
+    input.classList.add(isCorrect ? "correct" : "wrong");
+  }
+
+  clearInterval(state.timerId);
+  showFeedback(isCorrect, q);
+  finalizeAnswer(isCorrect);
+}
+
+function showFeedback(isCorrect, q){
+  const feedback = $("feedbackBox");
+  feedback.classList.remove("hidden");
+  if(isCorrect){
+    feedback.className = "feedback-box ok";
+    feedback.innerHTML = `<div>✅ CORRECT!</div><p>${q.explanation}</p>`;
+    soundCorrect();
+  } else {
+    feedback.className = "feedback-box bad";
+    const correctText = q.type === "mcq" ? q.answer : q.accept[0];
+    feedback.innerHTML = `<div>❌ INCORRECT</div><p>The correct answer is: <b>${correctText}</b>. ${q.explanation}</p>`;
+    soundWrong();
+  }
+}
+
+function finalizeAnswer(isCorrect){
+  state.answered = true;
+  if(isCorrect){
+    state.score += POINTS_PER_QUESTION;
+    state.correctCount++;
+  } else {
+    state.incorrectCount++;
+  }
+  $("checkBtn").classList.add("hidden");
+  $("nextBtn").classList.remove("hidden");
+  $("progressFill").style.width = ((state.currentIndex+1)/TOTAL_QUESTIONS*100) + "%";
+}
+
+/* ========================================
+   HINT
+   ======================================== */
+function showHint(){
+  const q = state.questions[state.currentIndex];
+  const box = $("hintBox");
+  box.textContent = "💡 " + q.hint;
+  box.classList.remove("hidden");
+}
+
+/* ========================================
+   NEXT / END
+   ======================================== */
+function nextQuestion(){
+  state.currentIndex++;
+  if(state.currentIndex >= TOTAL_QUESTIONS){
+    endGame();
+  } else {
+    showQuestion();
+  }
+}
+
+function endGame(){
+  clearInterval(state.timerId);
+  $("gameScreen").classList.add("hidden");
+  $("resultsScreen").classList.remove("hidden");
+
+  const score = state.score;
+  const grade = Math.max(1, Math.round(score/10));
+
+  $("congratsText").textContent = `Great job, ${state.studentName}!`;
+  $("correctNum").textContent = `${state.correctCount}/${TOTAL_QUESTIONS}`;
+  $("incorrectNum").textContent = `${state.incorrectCount}/${TOTAL_QUESTIONS}`;
+  $("scoreNum").textContent = `${score}/100`;
+  $("gradeNum").textContent = grade;
+
+  $("tName").textContent = state.studentName;
+  $("tCorrect").textContent = state.correctCount;
+  $("tIncorrect").textContent = state.incorrectCount;
+  $("tScore").textContent = score;
+  $("tGrade").textContent = grade;
+
+  $("finalMessage").textContent = gradeMessage(grade);
+  soundComplete();
+}
+
+function gradeMessage(grade){
+  if(grade === 10) return "🏆 Excellent! You mastered the Present Continuous!";
+  if(grade === 9) return "🌟 Great job! You have a very good understanding of the Present Continuous!";
+  if(grade === 8) return "👍 Very good! Keep practicing!";
+  if(grade === 7) return "😊 Good job! You are making progress!";
+  if(grade === 6) return "📚 Keep practicing. You are getting there!";
+  return "💪 Don't give up! Review the Present Continuous and try again!";
+}
+
+/* ========================================
+   RESTART / NAVIGATION
+   ======================================== */
+function playAgain(){
+  $("resultsScreen").classList.add("hidden");
+  $("studentName").value = state.studentName;
+  $("startScreen").classList.remove("hidden");
+}
+function backToStart(){
+  clearInterval(state.timerId);
+  $("gameScreen").classList.add("hidden");
+  $("resultsScreen").classList.add("hidden");
+  $("studentName").value = "";
+  $("nameError").textContent = "";
+  $("startScreen").classList.remove("hidden");
+}
+
+/* Allow Enter key to start game / submit answers */
+$("studentName").addEventListener("keyup", e=>{ if(e.key === "Enter") handleStart(); });
+document.addEventListener("keyup", e=>{
+  if(e.key === "Enter" && !$("gameScreen").classList.contains("hidden")){
+    if(!$("checkBtn").classList.contains("hidden")) checkAnswer();
+    else if(!$("nextBtn").classList.contains("hidden")) nextQuestion();
+  }
+});
+</script>
+</body>
+</html>
